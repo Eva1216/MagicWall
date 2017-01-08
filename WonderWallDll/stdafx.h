@@ -16,10 +16,7 @@
 // TODO:  在此处引用程序需要的其他头文件
  
 #include <tlhelp32.h>
+#include <Psapi.h>
+#include <WtsApi32.h>
+#pragma comment(lib,"WtsApi32.lib")
 
-
-
-// TODO:  在此处引用程序需要的其他头文件
-
-#define WONDERWALL_API						__declspec(dllexport) __stdcall
-#define WONDERWALL_BOOL_EXPORT				EXTERN_C BOOL WONDERWALL_API

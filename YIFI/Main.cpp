@@ -13,7 +13,7 @@ int main()
 	{
 		//获取Dll中导出的函数的地址
 		pfnRhInjectLibrary   RhInjectLibrary = NULL;
-		RhInjectLibrary = (pfnRhInjectLibrary)GetProcAddress(DllModuleHandle, "EnumProcess");
+		RhInjectLibrary = (pfnRhInjectLibrary)GetProcAddress(DllModuleHandle, "EnumProcess2");
 		int a = GetLastError();
 		PROCESSENTRY32 ProcessEntry[1000];
 		memset(ProcessEntry, 0, sizeof(ProcessEntry));
