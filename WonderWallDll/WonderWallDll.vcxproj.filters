@@ -13,6 +13,27 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Inject">
+      <UniqueIdentifier>{4be7fe0e-171b-4d22-b183-70d3f70c3f87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Process">
+      <UniqueIdentifier>{ce1cbe10-1a32-4f1b-8e48-4960fb6b2bd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Process\EnumProcess">
+      <UniqueIdentifier>{9b9d4b2d-d88a-4c47-bea1-300c563ec7b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hook">
+      <UniqueIdentifier>{a6ceebdc-4975-48ca-9872-782d1baaad58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Driver">
+      <UniqueIdentifier>{201b88d7-e578-49d7-9a90-f6ee5357d560}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DriverShared">
+      <UniqueIdentifier>{d6625110-7b6a-4fa0-a309-2f219554f4ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rtl">
+      <UniqueIdentifier>{c34b29e5-e276-4ae0-9896-01ba69cd4672}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -30,6 +51,12 @@
     <ClInclude Include="Common.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Driver\Driver.h">
+      <Filter>Driver</Filter>
+    </ClInclude>
+    <ClInclude Include="DriverShared\rtl.h">
+      <Filter>DriverShared</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -40,6 +67,21 @@
     </ClCompile>
     <ClCompile Include="dllmain.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Driver\Driver.cpp">
+      <Filter>Driver</Filter>
+    </ClCompile>
+    <ClCompile Include="Process\EnumProcess.cpp">
+      <Filter>Process\EnumProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="Rtl\file.cpp">
+      <Filter>Rtl</Filter>
+    </ClCompile>
+    <ClCompile Include="Rtl\error.cpp">
+      <Filter>Rtl</Filter>
+    </ClCompile>
+    <ClCompile Include="Rtl\memory.cpp">
+      <Filter>Rtl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -5,9 +5,12 @@
 using namespace std;
 typedef BOOL(*pfnEnumProcess)(PROCESSENTRY32* ProcessEntry,ULONG32 Index);
 
+typedef VOID(*pfnInstallDriver)(WCHAR* InDriverPath, WCHAR* InDriverName);
+BOOL EnableDebugPrivilege();
 VOID Test();
 int main()
 {
+	EnableDebugPrivilege();
 	Test();
 }
 
@@ -40,6 +43,51 @@ VOID Test()
 				i++;
 			}
 		}
+		pfnInstallDriver   RhInstallDriver = NULL;
+		RhInstallDriver = (pfnInstallDriver)GetProcAddress(DllModuleHandle, "RhInstallDriver");
+
+		if (RhInstallDriver != NULL)
+		{
+			//RhInstallDriver(L"DPC.sys", L"DPC.sys");
+		}
+
+
 	}
 }
 
+
+
+BOOL EnableDebugPrivilege()
+{
+
+	HANDLE hToken;
+	TOKEN_PRIVILEGES TokenPrivilege;
+	LUID uID;
+
+	if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken))
+	{
+		return FALSE;
+	}
+	if (!LookupPrivilegeValue(NULL, SE_DEBUG_NAME, &uID))
+	{
+		CloseHandle(hToken);
+
+		return FALSE;
+	}
+
+	TokenPrivilege.PrivilegeCount = 1;
+	TokenPrivilege.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+	TokenPrivilege.Privileges[0].Luid = uID;
+
+	if (!AdjustTokenPrivileges(hToken, false, &TokenPrivilege, sizeof(TOKEN_PRIVILEGES), NULL, NULL))
+	{
+		CloseHandle(hToken);
+
+		return  FALSE;
+	}
+
+	CloseHandle(hToken);
+
+	return TRUE;
+
+}

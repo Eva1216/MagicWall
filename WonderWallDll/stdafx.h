@@ -20,6 +20,11 @@
 #include <WtsApi32.h>
 #include <ntsecapi.h>
 #pragma comment(lib,"WtsApi32.lib")
+#include "DriverShared\rtl.h"
+#include "ntstatus.h"
+
+
+
 #define STATUS_INFO_LENGTH_MISMATCH    ((NTSTATUS)0xC0000004L)
 #define NT_SUCCESS(x) ((x) >= 0)
 #define EXTERN_C    extern "C"
@@ -27,6 +32,8 @@
 #define WONDERWALL_API						__declspec(dllexport)
 
 #define WONDERWALL_BOOL_EXPORT        EXTERN_C BOOL WONDERWALL_API
+
+#define WONDERWALL_NT_EXPORT		  EXTERN_C NTSTATUS WONDERWALL_API
 // 结构体定义  
 typedef struct _SYSTEM_PROCESS_INFORMATION {
 	ULONG                   NextEntryOffset;
@@ -143,3 +150,6 @@ NTSTATUS
 	OUT PULONG ReturnLength);
 
 
+
+
+BOOL RtlFileExists(WCHAR* InPath);
