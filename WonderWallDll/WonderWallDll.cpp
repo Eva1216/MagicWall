@@ -6,10 +6,40 @@
 #include "Common.h"
 #include "WonderWallDll.h"
 #include <cstdlib>
-extern "C"
-_declspec(dllexport)BOOL EnumProcess(PROCESSENTRY32* ProcessEntry)
-{
 
+pfnZwQuerySystemInformation ZwQuerySystemInformation = NULL;
+WONDERWALL_BOOL_EXPORT	EnumProcess(PROCESSENTRY32* ProcessEntry,ULONG32 Index)
+{
+	BOOL bRet = FALSE;
+	if (ProcessEntry == NULL)
+	{
+		return bRet;
+	}
+	switch (Index)
+	{
+	case 0:
+		bRet = EnumProcessByCreateToolhelp32Snapshot(ProcessEntry);
+		break;
+	case 1:
+		bRet = EnumProcessBypsapi(ProcessEntry);  
+		break;
+	case 2:
+		bRet = EnumProcessByZwQuerySystemInformation(ProcessEntry);
+		break;
+	case 3:
+		bRet = EnumProcessByWTSEnumerateProcesses(ProcessEntry);
+		break;
+	default:
+		break;
+	}
+	return bRet;
+}
+
+
+
+
+
+BOOL EnumProcessByCreateToolhelp32Snapshot(PROCESSENTRY32* ProcessEntry) {
 	int ProcessCount = 0;
 	//创建快照句柄，CreateToolhelp32Snapshot（）函数返回当前运行的进程快照句柄
 	HANDLE ToolHelpHandle = NULL;
@@ -36,13 +66,8 @@ _declspec(dllexport)BOOL EnumProcess(PROCESSENTRY32* ProcessEntry)
 	CloseHandle(ToolHelpHandle);
 	ToolHelpHandle = INVALID_HANDLE_VALUE;
 	return TRUE;
-
 }
-
-
-
-extern "C"
-_declspec(dllexport)BOOL EnumProcess2(PROCESSENTRY32* ProcessEntry)
+BOOL EnumProcessByZwQuerySystemInformation(PROCESSENTRY32* ProcessEntry)
 {
 	int ProcessCount = 0;
 	PWTS_PROCESS_INFO ppi;
@@ -69,8 +94,7 @@ _declspec(dllexport)BOOL EnumProcess2(PROCESSENTRY32* ProcessEntry)
 	return TRUE;
 
 }
-extern "C" 
-_declspec(dllexport)BOOL EnumProcess1(PROCESSENTRY32* ProcessEntry)
+BOOL EnumProcessBypsapi(PROCESSENTRY32* ProcessEntry)
 {
 
 	int ProcessCount = 0;
@@ -122,9 +146,85 @@ _declspec(dllexport)BOOL EnumProcess1(PROCESSENTRY32* ProcessEntry)
 
 		}
 	}
-	return 0;
+	return TRUE;
 }
+BOOL EnumProcessByWTSEnumerateProcesses(PROCESSENTRY32* ProcessEntry)
+{
 
+	int ProcessCount = 0;
+	HMODULE NtdllHmodule = GetModuleHandle(L"ntdll.dll");
+	ZwQuerySystemInformation = (pfnZwQuerySystemInformation)GetProcAddress(NtdllHmodule, "ZwQuerySystemInformation");
+
+	if (ZwQuerySystemInformation == NULL)
+	{
+		return FALSE;
+	}
+
+
+	UINT32 BufferLength = 0x1000;
+	void*  BufferData = NULL;
+
+	NTSTATUS Status = STATUS_INFO_LENGTH_MISMATCH;
+	HANDLE   HeapHandle = GetProcessHeap();      //获得当前进程默认堆
+
+	UINT32 ProcessID = 0;
+
+	BOOL   bOk = FALSE;
+	while (!bOk)
+	{
+		BufferData = HeapAlloc(HeapHandle, HEAP_ZERO_MEMORY, BufferLength);
+		if (BufferData == NULL)
+		{
+			return 0;
+		}
+
+		Status = ZwQuerySystemInformation(SystemProcessInformation, BufferData, BufferLength, (PULONG)&BufferLength);
+		if (Status == STATUS_INFO_LENGTH_MISMATCH)
+		{
+			//内存不足,将内存扩大二倍重新申请
+			HeapFree(HeapHandle, NULL, BufferData);
+			BufferLength *= 2;
+		}
+		else if (!NT_SUCCESS(Status))
+		{
+			//不让看
+			HeapFree(HeapHandle, NULL, BufferData);
+			return FALSE;
+		}
+		else
+		{
+
+			PSYSTEM_PROCESS_INFORMATION SystemProcess = (PSYSTEM_PROCESS_INFORMATION)BufferData;
+			while (SystemProcess)
+			{
+				//定义变量ProcessName接收Name
+				char ProcessName[MAX_PATH];
+				memset(ProcessName, 0, sizeof(ProcessName));
+				ProcessEntry[ProcessCount].th32ProcessID = (UINT32)SystemProcess->ProcessId;
+				memcpy(ProcessEntry[ProcessCount].szExeFile, SystemProcess->ImageName.Buffer, SystemProcess->ImageName.Length);
+				ProcessCount++;
+				/*	WideCharToMultiByte(0, 0, SystemProcess->ImageName.Buffer, SystemProcess->ImageName.Length, ProcessName, MAX_PATH, NULL, NULL);
+				ProcessID = (UINT32)(SystemProcess->ProcessId);*/
+				//printf("PID:\t%X,\tName:\t%s\r\n", ProcessID, ProcessName);
+
+				if (!SystemProcess->NextEntryOffset)
+				{
+					break;
+				}
+				SystemProcess = (PSYSTEM_PROCESS_INFORMATION)((unsigned char*)SystemProcess + SystemProcess->NextEntryOffset);
+			}
+
+			if (BufferData)
+			{
+				HeapFree(HeapHandle, NULL, BufferData);
+			}
+
+			bOk = TRUE;
+		}
+	}
+
+	return TRUE;
+}
 
 BOOL  WcharToChar(CHAR** szDestString, WCHAR* wzSourString)
 {
@@ -149,3 +249,7 @@ BOOL  WcharToChar(CHAR** szDestString, WCHAR* wzSourString)
 
 	return TRUE;
 }
+
+
+
+
