@@ -1,7 +1,52 @@
 #include "..\WonderWallDll.h"
 #include "..\Common.h"
 #include "..\stdafx.h"
+#include "..\..\WonderWallDriver\Trace.h"
+#include <Windows.h>
+#include <WinIoCtl.h>
 pfnZwQuerySystemInformation ZwQuerySystemInformation = NULL;
+
+
+BOOL EnumProcessInDriver(PROCESSENTRY32 * ProcessEntry)
+{
+	int ProcessCount = 0;
+
+	HANDLE ProcessHandle = NULL;
+
+	DWORD  dwReturn = 0;
+
+	int i = 0;
+	PROCESSENTRY32 Temp = { 0 };
+	for (i = 0; i<10000000; i += 4)
+
+	{
+
+		ProcessHandle = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, i);
+
+
+
+		if (ProcessHandle == NULL)
+		{
+			continue;
+		}
+		else
+		{
+			//向驱动发送请求
+			if (SendIoControl(&i, sizeof(ULONG32), &Temp, &dwReturn) == TRUE)
+			{
+				ProcessEntry[ProcessCount] = Temp;
+				ProcessEntry[ProcessCount].th32ProcessID = i;
+				ProcessCount++;
+			}
+
+		}
+		if (ProcessCount > 888)
+		{
+			break;
+		}
+	}
+	return TRUE;
+}
 BOOL EnumProcessByCreateToolhelp32Snapshot(PROCESSENTRY32* ProcessEntry) {
 	int ProcessCount = 0;
 	//创建快照句柄，CreateToolhelp32Snapshot（）函数返回当前运行的进程快照句柄
@@ -187,4 +232,70 @@ BOOL EnumProcessByWTSEnumerateProcesses(PROCESSENTRY32* ProcessEntry)
 	}
 
 	return TRUE;
+}
+
+
+BOOL  SendIoControl(int* InputData, ULONG InputSize, PROCESSENTRY32* ProcessInfo, DWORD* dwReturn)
+{
+	HANDLE hDevice = NULL;
+	BOOL   bOk = FALSE;
+
+
+
+	hDevice = CreateFile(L"\\\\.\\WonderWallDriverLinkName", GENERIC_READ | GENERIC_WRITE,
+
+		FILE_SHARE_READ | FILE_SHARE_WRITE,
+
+		NULL,
+
+		OPEN_EXISTING,
+
+		FILE_ATTRIBUTE_NORMAL,
+
+		NULL);
+
+
+
+	if (hDevice == INVALID_HANDLE_VALUE)
+	{
+		return FALSE;
+	}
+	bOk = DeviceIoControl(hDevice, CTL_GETPROCESSIMAGNAMEBYID,
+
+		InputData,
+
+		InputSize,
+
+		ProcessInfo,
+
+		sizeof(PROCESSENTRY32),
+
+		dwReturn,
+
+		NULL);
+
+
+
+
+
+	if (bOk == FALSE)
+
+	{
+
+		CloseHandle(hDevice);
+
+		hDevice = NULL;
+
+
+
+		return FALSE;
+
+	}
+
+	CloseHandle(hDevice);
+
+	hDevice = NULL;
+
+	return TRUE;
+
 }

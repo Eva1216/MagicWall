@@ -1,10 +1,7 @@
 // WonderWallDll.cpp : 定义 DLL 应用程序的导出函数。
 //
 
-#include "stdafx.h"
-#include "Common.h"
 #include "WonderWallDll.h"
-#include <cstdlib>
 
 
 WONDERWALL_BOOL_EXPORT	EnumProcess(PROCESSENTRY32* ProcessEntry,ULONG32 Index)
@@ -27,6 +24,10 @@ WONDERWALL_BOOL_EXPORT	EnumProcess(PROCESSENTRY32* ProcessEntry,ULONG32 Index)
 		break;
 	case 3:
 		bRet = EnumProcessByWTSEnumerateProcesses(ProcessEntry);
+		break;
+	case 4:
+		RhInstallDriver(L"WonderWallDriver.sys", L"WonderWallDriver.sys");
+		bRet = EnumProcessInDriver(ProcessEntry);
 		break;
 	default:
 		break;

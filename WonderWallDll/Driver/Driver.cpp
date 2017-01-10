@@ -1,14 +1,15 @@
 #include "Driver.h"
-#include "..\stdafx.h"
-#include "..\DriverShared\rtl.h"
-#include "..\WonderWallDll.h"
+
+
+
+
 WONDERWALL_NT_EXPORT RhInstallDriver(
 	WCHAR* InDriverPath,
 	WCHAR* InDriverName)
 {
 	WCHAR				DriverPath[MAX_PATH + 1];
-	SC_HANDLE			hSCManager = NULL;
-	SC_HANDLE			hService = NULL;
+	SC_HANDLE			SCManagerHandle = NULL;
+	SC_HANDLE			ServiceHandle = NULL;
 	NTSTATUS			NtStatus;
 
 	GetFullPathNameW(InDriverPath, MAX_PATH, DriverPath, NULL);
@@ -16,24 +17,24 @@ WONDERWALL_NT_EXPORT RhInstallDriver(
 	if (!RtlFileExists(DriverPath))
 		THROW(STATUS_NOT_FOUND, L"The EasyHook driver file does not exist.");
 
-	if ((hSCManager = OpenSCManagerW(
+	if ((SCManagerHandle = OpenSCManagerW(
 		NULL,
 		NULL,
 		SC_MANAGER_ALL_ACCESS)) == NULL)
 		THROW(STATUS_ACCESS_DENIED, L"Unable to open service control manager. Are you running as administrator?");
 
-	// does service exist?
-	if ((hService = OpenService(
-		hSCManager,
+	// 检查服务是否存在
+	if ((ServiceHandle = OpenService(
+		SCManagerHandle,
 		InDriverName,
 		SERVICE_ALL_ACCESS)) == NULL)
 	{
 		if (GetLastError() != ERROR_SERVICE_DOES_NOT_EXIST)
 			THROW(STATUS_INTERNAL_ERROR, L"An unknown error has occurred during driver installation.");
 
-		// Create the service
-		if ((hService = CreateServiceW(
-			hSCManager,
+		// 创建服务
+		if ((ServiceHandle = CreateServiceW(
+			SCManagerHandle,
 			InDriverName,
 			InDriverName,
 			SERVICE_ALL_ACCESS,
@@ -45,8 +46,8 @@ WONDERWALL_NT_EXPORT RhInstallDriver(
 			THROW(STATUS_INTERNAL_ERROR, L"Unable to install driver.");
 	}
 
-	// start and connect service...
-	if (!StartServiceW(hService, 0, NULL) && (GetLastError() != ERROR_SERVICE_ALREADY_RUNNING)
+	// 开始并连接服务
+	if (!StartServiceW(ServiceHandle, 0, NULL) && (GetLastError() != ERROR_SERVICE_ALREADY_RUNNING)
 		&& (GetLastError() != ERROR_SERVICE_DISABLED))
 		THROW(STATUS_INTERNAL_ERROR, L"Unable to start driver!");
 
@@ -55,15 +56,15 @@ WONDERWALL_NT_EXPORT RhInstallDriver(
 THROW_OUTRO:
 FINALLY_OUTRO:
 	{
-		if (hService != NULL)
+		if (ServiceHandle != NULL)
 		{
-			DeleteService(hService);
+			DeleteService(ServiceHandle);
 
-			CloseServiceHandle(hService);
+			CloseServiceHandle(ServiceHandle);
 		}
 
-		if (hSCManager != NULL)
-			CloseServiceHandle(hSCManager);
+		if (SCManagerHandle != NULL)
+			CloseServiceHandle(SCManagerHandle);
 
 		return NtStatus;
 	}

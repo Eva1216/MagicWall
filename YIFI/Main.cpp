@@ -5,7 +5,8 @@
 using namespace std;
 typedef BOOL(*pfnEnumProcess)(PROCESSENTRY32* ProcessEntry,ULONG32 Index);
 
-typedef VOID(*pfnInstallDriver)(WCHAR* InDriverPath, WCHAR* InDriverName);
+typedef VOID(*pfnInstallDriver)(WCHAR* InDriverPath, WCHAR* InDriverName);	//¼ÓÔØÇý¶¯
+
 BOOL EnableDebugPrivilege();
 VOID Test();
 int main()
@@ -32,7 +33,7 @@ VOID Test()
 		//int a = GetLastError();
 		PROCESSENTRY32 ProcessEntry[1000];
 		memset(ProcessEntry, 0, sizeof(ProcessEntry));
-		BOOL bRet = RhEnumProcess(ProcessEntry, 0);
+		BOOL bRet = RhEnumProcess(ProcessEntry, 4);
 		if (bRet)
 		{
 			int i = 0;
@@ -43,6 +44,9 @@ VOID Test()
 				i++;
 			}
 		}
+
+		getchar();
+		getchar();
 		pfnInstallDriver   RhInstallDriver = NULL;
 		RhInstallDriver = (pfnInstallDriver)GetProcAddress(DllModuleHandle, "RhInstallDriver");
 
