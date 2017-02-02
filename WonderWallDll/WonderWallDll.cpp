@@ -3,7 +3,22 @@
 
 #include "WonderWallDll.h"
 
+WONDERWALL_BOOL_EXPORT	InJectProcess(CHAR*	 ProcessName, CHAR*	DllName,CHAR* FunctionName, ULONG32 Index)
+{
+	BOOL	bRet = FALSE;
+	if (ProcessName == NULL || DllName == NULL)
+	{
+		return FALSE;
+	}
+	switch (Index)
+	{
+	case 0:
+		bRet = IatInject(ProcessName, DllName,FunctionName);
+	default:
+		break;
+	}
 
+}
 WONDERWALL_BOOL_EXPORT	EnumProcess(PROCESSENTRY32* ProcessEntry,ULONG32 Index)
 {
 	BOOL bRet = FALSE;

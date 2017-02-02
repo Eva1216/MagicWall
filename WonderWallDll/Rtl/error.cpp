@@ -19,7 +19,7 @@ PWCHAR RtlGetLastErrorString()
 #ifndef DRIVER
 PWCHAR RtlGetLastErrorStringCopy()
 {
-    // https://easyhook.codeplex.com/workitem/24958
+   
     ULONG len = (ULONG)(wcslen(LastError)+1)*sizeof(TCHAR);
     PWCHAR pBuffer = (PWCHAR) CoTaskMemAlloc(len);
     CopyMemory(pBuffer, LastError, len);

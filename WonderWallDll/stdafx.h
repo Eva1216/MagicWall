@@ -153,3 +153,4 @@ NTSTATUS
 
 
 BOOL RtlFileExists(WCHAR* InPath);
+#define ERROR_MESSAGE(MSG) std::cout<<MSG<<std::endl;

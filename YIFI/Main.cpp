@@ -1,21 +1,60 @@
 #include <Windows.h>
 #include <tlhelp32.h>
 #include <iostream>
+#include <vector>
+#include <atlstr.h>
 #include "..\WonderWallDll\WonderWallDll.h"
 using namespace std;
+
 typedef BOOL(*pfnEnumProcess)(PROCESSENTRY32* ProcessEntry,ULONG32 Index);
+typedef BOOL(*pfnInjectProcess)(CHAR*	 ProcessName, CHAR*	DllName, CHAR* FunctionName, ULONG32 Index);
 
 typedef VOID(*pfnInstallDriver)(WCHAR* InDriverPath, WCHAR* InDriverName);	//加载驱动
 
+
+ 
 BOOL EnableDebugPrivilege();
 VOID Test();
+
+VOID InjectTest();
 int main()
 {
 	EnableDebugPrivilege();
-	Test();
+	InjectTest();
+	//Test();
+	 
 }
 
+VOID InjectTest()
+{
+	HMODULE DllModuleHandle = LoadLibrary(L"WonderWallDll.dll");
 
+	if (DllModuleHandle != NULL)
+	{
+		//获取Dll中导出的函数的地址
+		pfnInjectProcess   RhInjectProcess = NULL;
+		RhInjectProcess = (pfnInjectProcess)GetProcAddress(DllModuleHandle, "InJectProcess");
+		if (RhInjectProcess == NULL)
+		{
+			cout << "Failed to Find Func" << endl;
+			return;
+		}
+		BOOL bRet = RhInjectProcess("Target.exe", "InjectDll.dll", "InjectFunction",0);
+		getchar();
+		getchar();
+	}
+	
+
+}
+ 
+
+
+ 
+
+
+
+
+ 
 VOID Test()
 {
 	HMODULE DllModuleHandle = LoadLibrary(L"WonderWallDll.dll");
