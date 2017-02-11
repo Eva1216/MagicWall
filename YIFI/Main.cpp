@@ -20,8 +20,8 @@ VOID InjectTest();
 int main()
 {
 	EnableDebugPrivilege();
-	InjectTest();
-	//Test();
+	//InjectTest();
+	Test();
 	 
 }
 

@@ -93,8 +93,11 @@ NTSTATUS ControlPassDispatch(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 
 			return STATUS_SUCCESS;
 		}
-
-
+		break;
+	}
+	case	CTL_INJECTPROCESS:
+	{
+		InjectProcess();
 		break;
 	}
 	}
@@ -137,6 +140,9 @@ VOID  UnloadDriver(PDRIVER_OBJECT DriverObject)
 	PDEVICE_OBJECT  CurrentDeviceObject = NULL;
 	PDEVICE_OBJECT  NextDeviceObject = NULL;
 
+
+	//InjectProcess	ÍË³ö´¦Àí
+	ExitInjectProcess();
 
 	RtlInitUnicodeString(&uniLinkName, LINK_NAME);
 	IoDeleteSymbolicLink(&uniLinkName);

@@ -20,6 +20,9 @@
     <Filter Include="Process">
       <UniqueIdentifier>{bf071241-5b2e-42be-be86-f6278ac2333e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Inject">
+      <UniqueIdentifier>{0f6c22ed-9fd2-40b3-8973-972d0bd1c7cf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WonderWallDriver.c">
@@ -27,6 +30,9 @@
     </ClCompile>
     <ClCompile Include="Process\Process.c">
       <Filter>Process</Filter>
+    </ClCompile>
+    <ClCompile Include="Inject\Inject.c">
+      <Filter>Inject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -41,6 +47,9 @@
     </ClInclude>
     <ClInclude Include="Trace.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inject\Inject.h">
+      <Filter>Inject</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

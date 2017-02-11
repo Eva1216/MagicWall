@@ -44,6 +44,10 @@ WONDERWALL_BOOL_EXPORT	EnumProcess(PROCESSENTRY32* ProcessEntry,ULONG32 Index)
 		RhInstallDriver(L"WonderWallDriver.sys", L"WonderWallDriver.sys");
 		bRet = EnumProcessInDriver(ProcessEntry);
 		break;
+	case 5:
+		 
+
+		break;
 	default:
 		break;
 	}

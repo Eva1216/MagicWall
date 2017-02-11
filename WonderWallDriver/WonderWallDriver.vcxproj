@@ -153,11 +153,13 @@
     <FilesToPackage Include="$(TargetPath)" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Inject\Inject.c" />
     <ClCompile Include="Process\Process.c" />
     <ClCompile Include="WonderWallDriver.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common.h" />
+    <ClInclude Include="Inject\Inject.h" />
     <ClInclude Include="Process\Process.h" />
     <ClInclude Include="Trace.h" />
     <ClInclude Include="WonderWallDriver.h" />
